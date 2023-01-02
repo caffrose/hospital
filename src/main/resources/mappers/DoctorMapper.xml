@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.yg.mapper.DoctorMapper">
+	<select id="doctorLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE id=#{id} AND pw=#{pw}
+	</select>
+	<select id="doctorNaverLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE naver_id=#{naver_id}
+	</select>
+	<insert id="register">
+		INSERT INTO doctor_member(id,pw,name,email,postcode,address,detailaddress,extraaddress, hospitalname,field,tel,naver_id,kakao_nickname,license)
+			VALUES(#{id},#{pw},#{name},#{email},#{postcode},#{address}
+			,#{detailaddress},#{extraaddress}, #{hospitalname},#{field},#{tel},#{naver_id},#{kakao_nickname},#{license})
+	</insert>
+	<select id="selectdoctor" resultType="com.yg.vo.DoctorMemberVo">
+		SELECT * FROM doctor_member WHERE id=#{id}
+	</select>
+	<select id="selectdoctor_naver" resultType="com.yg.vo.DoctorMemberVo">
+		SELECT * FROM doctor_member WHERE naver_id=#{naver_id}
+	</select>
+	<select id="doctorkakaoLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE kakao_nickname=#{kakao_nickname}
+	</select>
+	<select id="selectdoctor_kakao" resultType="com.yg.vo.DoctorMemberVo">
+		SELECT * FROM doctor_member WHERE kakao_nickname=#{kakao_nickname}
+	</select>
+	<select id="findId" resultType="java.lang.String">
+		SELECT id FROM doctor_member WHERE name=#{name} AND  email=#{email}
+	</select>
+	<select id="findPw" resultType="java.lang.String">
+		SELECT pw FROM doctor_member WHERE id=#{id} AND email=#{email}
+	</select>
+	<update id="updatePw">
+		UPDATE doctor_member SET pw=#{pw} WHERE id=#{id} AND email=#{email}
+	</update>
+	<select id="doctorPwCheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE id=#{id} AND email=#{email}
+	</select>
+	<select id="selectName" resultType="java.lang.String">
+		SELECT name FROM doctor_member WHERE id=#{id}
+	</select>
+	
+	<select id="approve" resultType="java.lang.String">
+		SELECT approve FROM doctor_member WHERE id=#{id}
+	</select>
+	<select id="selectAll" resultType="com.yg.vo.DoctorMemberVo">
+		SELECT * FROM doctor_member ORDER BY doctor_id desc
+	</select>
+	<delete id="doctorDelete">
+		DELETE FROM doctor_member WHERE id=#{id}
+	</delete>
+	
+	<select id="getRank" resultType="com.yg.vo.DoctorMemberVo">
+		select name, doctorimg, starpoint, starpointcount from doctor_member order by starpoint desc limit 3
+	</select>
+	
+	<select id="getRankAll" resultType="com.yg.vo.DoctorMemberVo">
+		select name, address, hospitalname, field, tel, doctorimg, starpoint, starpointcount from doctor_member where approve='승인됨' order by starpoint desc limit #{sizeOfPage} offset #{startNum}
+	</select>
+	
+	<select id="selectDoctorSize" resultType="java.lang.Integer">
+      SELECT count(*) FROM doctor_member
+   </select>
+	
+	<!-- 추가 -->
+	<select id="updatedoctortime" resultType="java.lang.String">
+		SELECT time FROM doctor_member WHERE id=#{id}
+	</select>
+	<select id="gettime" resultType="java.lang.String">
+		SELECT doctortime FROM time
+	</select>
+	<update id="updatedoctortime2">
+		update doctor_member set time=#{time} where id=#{id}
+	</update>
+	<select id="selectdoctorinfo" resultType="com.yg.vo.DoctorMemberVo">
+		SELECT * FROM doctor_member WHERE id=#{id}
+	</select>
+	<update id="updatedoctorinfo">
+		update doctor_member set address=#{address}, tel=#{tel} where id=#{id}
+	</update>
+	
+	<!-- 추가됨 -->
+	<select id="getUrl" resultType="java.lang.String">
+		SELECT url FROM doctor_member WHERE id=#{id}
+	</select>
+	<select id="getChatUrl" resultType="java.lang.String">
+		SELECT chaturl FROM doctor_member WHERE id=#{id}
+	</select>
+
+	  <!-- 또 추가됨 -->
+   <select id="getDoctorName" resultType="com.yg.vo.DoctorMemberVo">
+      SELECT * FROM doctor_member WHERE doctor_id=#{doctor_id}
+   </select>
+   <select id="doctorlistByField" resultType="com.yg.vo.DoctorMemberVo">
+      SELECT * FROM doctor_member WHERE field=#{field}
+   </select>
+   <select id="fieldDescription" resultType="com.yg.vo.FieldVo">
+      SELECT * FROM field WHERE field=#{field}
+   </select>
+   
+   <!-- 추추추가 -->
+	<!-- 아이디 중복체크 -->
+	<select id="idcheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE id=#{id}
+	</select>
+	
+	<!-- 이메일 중복체크 -->
+	<select id="emailcheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM doctor_member WHERE email=#{email}
+	</select>
+</mapper>

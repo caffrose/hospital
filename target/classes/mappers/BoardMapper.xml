@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.yg.mapper.BoardMapper">
+   <insert id="insert">
+      INSERT INTO board(title,content,writer,file) VALUES(#{title},#{content},#{writer},#{file})
+   </insert>
+   <update id="update">
+      UPDATE board SET title=#{title}, content=#{content}, file=#{file} WHERE bno=#{bno}
+   </update>
+   <update id="updateExfile">
+      UPDATE board SET title=#{title}, content=#{content} WHERE bno=#{bno}
+   </update>
+   <select id="selectOne" resultType="com.yg.vo.BoardVo">
+      SELECT * FROM board WHERE bno=#{bno}
+   </select>
+   <select id="selectAll" resultType="com.yg.vo.BoardVo">
+      SELECT * FROM board ORDER BY FIELD(writer,'admin'),bno desc
+   </select>
+   <select id="selectBno" resultType="java.lang.Integer">
+      SELECT bno FROM board WHERE title=#{title} AND content=#{content}
+   </select>
+   <delete id="delete">
+      DELETE FROM board WHERE bno=#{bno}
+   </delete>
+   <select id="selectBoardSize" resultType="java.lang.Integer">
+      SELECT count(*) FROM board
+   </select>
+   <select id="selectBoardPaging" resultType="com.yg.vo.BoardVo">
+      SELECT * FROM board ORDER BY FIELD(writer,'admin')desc,bno desc limit #{sizeOfPage} offset #{startNum}
+   </select>
+</mapper>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.yg.mapper.Mapper">
+	<select id="partlist" resultType="com.yg.vo.DescriptionVo">
+		SELECT MIN(dnum), part FROM explain_test GROUP BY part;
+	</select>
+	
+	<select id="selectDetail" resultType="com.yg.vo.DescriptionVo">
+		SELECT * FROM explain_test WHERE part=#{part}
+	</select>
+	
+	<select id="showdescription" resultType="com.yg.vo.DescriptionVo">
+		SELECT description FROM explain_test WHERE symptom = #{symptom} AND part = #{part}
+	</select>
+	
+	<select id="select" resultType="com.yg.vo.DiseaseVo">
+		SELECT * FROM disease3 WHERE part=#{part}
+	</select>
+
+	<!-- 의사 일정추가 -->		<!-- 변경 -->
+	<insert id="insertCalendar">
+		insert into calendar(doctorNum,title,startDate,endDate,mid,related,diseaseName,type) values(#{doctorNum},#{title},#{startDate},#{endDate}, #{mid},#{related},#{diseaseName},#{type})
+	</insert>
+	
+	<!-- 의사 개인 일정 보여주기 -->
+	<select id="showCalendar" resultType="com.yg.vo.calendarVo">
+		select * from calendar where doctorNum= #{doctorNum}
+	</select>
+	
+	<!-- 일정 총 개수 -->
+	<select id="countCalendar" resultType="java.lang.Integer">
+		select count(*) from calendar
+	</select>
+	
+	<!-- 삭제하려는 일정 확인 -->		<!-- 변경 -->
+	<select id="checkCalendar" resultType="java.lang.Integer">
+		select cNum from calendar where mid=#{mid} and startDate= #{startDate} and endDate= #{endDate} and doctorNum=#{doctorNum}
+	</select>
+	
+	<!-- 일정 삭제 -->
+	<delete id="deleteCalendar">
+		delete from calendar where cNum= #{cNum}
+	</delete>
+	
+
+	<select id="showCalendarAll" resultType="com.yg.vo.countCalendarVo">
+      select startDate, endDate,sum(count) as count, sum(doctorcount) as doctorcount from countcalendar where<choose>
+            <when test="depart.size != 0">
+               part in
+                <foreach collection="depart" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+        </choose>  group by startDate; 
+   </select>
+	
+	<!-- 가능한 의사 의사 테이블에서 불러오기 -->
+	<!-- 요일,시간,과 로 의사뽑아오기 -->
+	<select id="selectdoctor" resultType="com.yg.vo.DoctorMemberVo">
+		select * from doctor_member where time like concat('%',#{dowtime},'%') and approve = '승인됨'
+		<choose>
+            <when test="depart.size != 0">
+                and field in
+                <foreach collection="depart" item="item" index="index" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </when>
+        </choose>
+	</select>
+	
+	<!-- 시작시간으로 의사넘버 뽑아오기 -->
+	<select id="selectdoctor2" resultType="Integer">
+		select doctorNum from calendar where startDate=#{startDate}
+	</select>
+	
+	<!-- countCalendar에 값 넣기 -->
+	<insert id="insertCountCalendar">
+		insert into countcalendar(part,startDate,endDate,doctorcount) values(#{part},#{startDate},#{endDate},#{doctorcount})
+	</insert>
+	
+	<!-- countcalendar에 과 랑 날짜가 중복이 되면 -->
+	<select id="ifCountCalendar" resultType="java.lang.Integer">
+		select count(*) from countcalendar where part= #{part} and startDate= #{startDate}
+	</select>
+	
+	<!-- countCalendar에 값이 있을시에 count 증가 -->
+	<update id="updateCount">
+		update countcalendar set count=count+1 where part= #{part} and startDate= #{startDate}
+	</update>
+	
+	<!-- doctorid로 doctornum뽑아오기 -->
+	<select id="getdoctorNum" resultType="java.lang.Integer">
+		select doctor_id from doctor_member where id= #{id}
+	</select>
+	
+	<!-- 의사 스케줄 가져오기(의사번호별로) -->
+	<select id="showdoctorevent" resultType="com.yg.vo.calendarVo">
+		select * from calendar where doctorNum= #{doctorNum}
+	</select>
+	
+	<!-- 예약한 환자 정보 가져오기 -->	<!-- 추가 -->
+	<select id="showpatientinfotodoctor" resultType="com.yg.vo.calendarVo">
+		select * from calendar where doctorNum= #{doctorNum} and startDate= #{startDate} and endDate= #{endDate}
+	</select>
+	
+	<!-- 의사번호로 의사과 가져오기 -->	<!-- 추가 -->
+	<select id="getdoctorpart" resultType="String">
+		select field from doctor_member where doctor_id= #{doctorNum}
+	</select>
+	
+	<!-- contcalendar에서 count가져오기 -->	<!-- 추가 -->
+	<select id="getcount" resultType="Integer">
+		select count from countcalendar where startDate= #{startDate} and part=#{part}
+	</select>
+	
+	<!-- countCalendar에 값이 1이 아닐시에 count 감소 -->		<!-- 추가 -->
+	<update id="updatecountfordelete">
+		update countcalendar set count=count-1 where part= #{part} and startDate= #{startDate}
+	</update>
+	
+	<!-- 일정 삭제 -->
+	<delete id="deletecount">	<!-- 추가 -->
+		delete from countcalendar where part= #{part} and startDate= #{startDate}
+	</delete>
+	
+	<!-- 추가 -->
+	<!-- 소비자 예약내역(채팅완료한 경우) -->	
+	<select id="clientreportfinish" resultType="com.yg.vo.calendarVo">
+		select * from calendar where mid=#{id} and finish=1 order by startDate
+	</select>
+	
+	<!-- 소비자 예약내역(채팅안한 경우) -->	
+	<select id="clientreportnotfinish" resultType="com.yg.vo.calendarVo">
+		select * from calendar where mid=#{id} and finish=0 order by startDate
+	</select>
+	
+	<!-- 별점 업데이트 -->	
+	<update id="insertstarpoint">
+		update doctor_member set starpoint=#{starpoint}, starpointcount=#{starpointcount} where doctor_id=#{doctor_id}
+	</update>
+	
+	<!-- 닥터넘버로 별점가져오기 -->	
+	<select id="selectstarpoint" resultType="Double">
+		select starpoint from doctor_member where doctor_id=#{doctor_id}
+	</select>
+	
+	<!-- 닥터넘버로 별점사람수 가져오기 -->	
+	<select id="selectstarpointcount" resultType="Integer">
+		select starpointcount from doctor_member where doctor_id=#{doctor_id}
+	</select>
+	
+	<!-- 캘린더에 별점 여부 업데이트 -->	
+	<update id="updatecalendarfinish">
+		update calendar set starpoint=1 where doctorNum= #{doctor_id} and startDate= #{startDate}
+	</update>
+	
+	<!-- calendar에 의사 개인일정 넣기 -->
+   <insert id="blockdoctortime">
+      insert into calendar(title, startDate, endDate, doctorNum) values(#{title},#{startDate},#{endDate},#{doctorNum})
+   </insert>
+   
+   <!-- 추추추추가 -->
+   <update id="updateFinish">
+   		UPDATE calendar SET finish=1 WHERE cNum=#{cnum}
+   </update>
+</mapper>

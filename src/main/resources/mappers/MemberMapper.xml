@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.yg.mapper.MemberMapper">
+	<select id="memberLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE id=#{id} AND pw=#{pw}
+	</select>
+	<select id="memberNaverLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE naver_id=#{naver_id}
+	</select>
+	<insert id="register">
+		INSERT INTO client_member(id,pw,name,email,postcode,address,detailaddress,extraaddress,tel,naver_id,kakao_nickname) 
+					VALUES(#{id},#{pw},#{name},#{email},#{postcode},#{address},#{detailaddress},
+					#{extraaddress},#{tel},#{naver_id},#{kakao_nickname})
+	</insert>
+	<select id="selectclient" resultType="com.yg.vo.ClientMemberVo">
+		SELECT * FROM client_member WHERE id=#{id}
+	</select>
+	<select id="selectclient_naver" resultType="com.yg.vo.ClientMemberVo">
+		SELECT * FROM client_member WHERE naver_id=#{naver_id}
+	</select>
+	<select id="memberkakaoLogin" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE kakao_nickname=#{kakao_nickname}
+	</select>
+	<select id="selectclient_kakao" resultType="com.yg.vo.ClientMemberVo">
+		SELECT * FROM client_member WHERE kakao_nickname=#{kakao_nickname}
+	</select>
+	<select id="findId" resultType="java.lang.String">
+		SELECT id FROM client_member WHERE name=#{name} AND  email=#{email}
+	</select>
+	<select id="findPw" resultType="java.lang.String">
+		SELECT pw FROM client_member WHERE id=#{id} AND email=#{email}
+	</select>
+	<update id="updatePw">
+		UPDATE client_member SET pw=#{pw} WHERE id=#{id} AND email=#{email}
+	</update>
+	<select id="clientPwCheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE id=#{id} AND email=#{email}
+	</select>
+	<select id="selectName" resultType="java.lang.String">
+		SELECT name FROM client_member WHERE id=#{id}
+	</select>
+	
+	<!-- 추가 -->
+	<select id="selectAdmin" resultType="java.lang.String">
+		SELECT type FROM client_member WHERE id=#{id}
+	</select>
+	<update id="clientUpdate">
+		UPDATE client_member SET name=#{name},postcode=#{postcode},address=#{address},detailaddress=#{detailaddress}
+					,extraaddress=#{extraaddress},tel=#{tel} WHERE id=#{id}
+	</update>
+	<delete id="clientDelete">
+		DELETE FROM client_member WHERE id=#{id}
+	</delete>
+	
+	
+	
+	<insert id="insertmail">
+		insert into mail(memberid, doctorid, content,datetime) values(#{memberid},#{doctorid},#{content},#{datetime})
+	</insert>
+	<select id="selectmymail" resultType="com.yg.vo.mailVo">
+		SELECT * FROM mail WHERE memberid=#{id}
+	</select>
+	
+	<update id="updatehitcount">
+		UPDATE mail SET hit=1 WHERE num=#{num}
+	</update>
+	
+	<select id="showmaildetail" resultType="com.yg.vo.mailVo">
+		SELECT * FROM mail WHERE num=#{num}
+	</select>
+	
+	<select id="newmailcheck" resultType="Integer">
+		SELECT hit FROM mail WHERE memberid=#{id}
+	</select>
+	
+	<!-- 추추추가 -->
+	<!-- 아이디 중복체크 -->
+	<select id="idcheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE id=#{id}
+	</select>
+	
+	<!-- 이메일 중복체크 -->
+	<select id="emailcheck" resultType="java.lang.Integer">
+		SELECT COUNT(*) FROM client_member WHERE email=#{email}
+	</select>
+	
+	<select id="getName" resultType="java.lang.String">
+		SELECT name FROM client_member WHERE id=#{id}
+	</select>
+</mapper>
